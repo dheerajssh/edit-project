@@ -1,0 +1,15 @@
+FROM golang:1.22.0
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the source code to the working directory
+COPY . .
+
+# Expose the port the application is running on
+EXPOSE 5606
+EXPOSE 5608
+EXPOSE 5609
+
+# Start the application
+CMD ["go", "run", "main.go", "-d"]

@@ -1,0 +1,9 @@
+# Use a specific version of MySQL as the base image
+FROM mysql:8.0
+
+# Set the root password and create the database
+ENV MYSQL_ROOT_PASSWORD=yourpassword
+ENV MYSQL_DATABASE=databasename
+
+# Expose the MySQL port
+EXPOSE 3306
