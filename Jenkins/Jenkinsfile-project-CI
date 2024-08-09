@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    environment {
+        SSH_CREDENTIALS_ID = 'your ssh credential ID'
+        TARGET_IP = 'Public IP of target machine'
+        REMOTE_PATH = 'working directory of project'
+    }
+    
+    stages {
+        stage('Checkout') { //Code will be downloaded from git to your jenkins workspace    
+            steps {
+                git credentialsId: 'your git credentials saved on jenkins'
+            }
+        }
+
+        stage('Synchronize') { //The source code will be copied to the build server to build the application
+            steps {
+                script {
+					sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+						// Use the sh step to execute the SSH command
+						sh "rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no' /path/to/your/jenkins/workspace/* root@${TARGET_IP}:${REMOTE_PATH}"
+					}	
+                }
+            }
+        }
+        
+        stage('build') { //Compile and build the application to generate an executable file
+            steps {
+                script {
+                    // Run npm commands
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd ${REMOTE_PATH} && sudo go mod tidy'"					
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd ${REMOTE_PATH} && sudo go build main'"
+                    }
+                }
+            }
+        }
+    }
+}
