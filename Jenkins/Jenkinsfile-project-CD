@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+    
+    environment {
+        SSH_CREDENTIALS_ID = 'your ssh credential ID'
+        TARGET_IP = 'Public IP of target machine'
+        DOCKER_BACKEND_IMAGE_NAME = 'project-app-image:latest'
+		DOCKER_MYSQL_IMAGE_NAME = 'database-app-image:latest'
+        DOCKER_BACKEND_CONTAINER_NAME = 'project-app'
+		DOCKER_MYSQL_CONTAINER_NAME = 'database-app'
+    }
+    
+    stages {
+	
+        stage ('Sync') {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        // Sync source files to destination folder on remote machine
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'rsync -avz --delete /path/to/executable /project/directory/on/target/machine/'"
+                    }
+                }
+            }
+        }
+	
+        stage('Containerize Backend') {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd /project/directory/on/target/machine/ && docker build -t $DOCKER_BACKEND_IMAGE_NAME -f Dockerfile.backend .'"
+                    }
+                }
+            }
+        }
+        
+        stage('Containerize Database') {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd /project/directory/on/target/machine/ && docker build -t $DOCKER_MYSQL_IMAGE_NAME -f Dockerfile.mysql .'"
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy Database') {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        def containerExists = sh(script: "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker ps -a --format {{.Names}} | grep -w $DOCKER_MYSQL_CONTAINER_NAME'", returnStatus: true)
+                        if (containerExists == 0) {
+                            sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker stop $DOCKER_MYSQL_CONTAINER_NAME && docker rm $DOCKER_MYSQL_CONTAINER_NAME'"
+                        }
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker run -p <host_port>:3306 -e MYSQL_ROOT_PASSWORD=yourrootpassword -e MYSQL_DATABASE=yourdatabasename -v <hostpath>:<container-path> -d --name $DOCKER_MYSQL_CONTAINER_NAME $DOCKER_MYSQL_IMAGE_NAME'"
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy Backend') {
+            steps {
+                script {
+                    sshagent(credentials: [SSH_CREDENTIALS_ID]) {
+                        def containerExists = sh(script: "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker ps -a --format {{.Names}} | grep -w $DOCKER_BACKEND_CONTAINER_NAME'", returnStatus: true)
+                        if (containerExists == 0) {
+                            sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker stop $DOCKER_BACKEND_CONTAINER_NAME && docker rm $DOCKER_BACKEND_CONTAINER_NAME'"
+                        }
+                        sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'docker run -d -p <host_port>:<container_port> --network host -e MYSQL_HOST=127.0.0.1 -e MYSQL_PORT=3306 -e MYSQL_USER=root -e MYSQL_PASSWORD=yourrootpassword -e MYSQL_DB=yourdatabasename -v <hostpath>:<container-path> --name $DOCKER_BACKEND_CONTAINER_NAME $DOCKER_BACKEND_IMAGE_NAME'"
+                    }
+                }
+            }
+        }
+    }
+}
