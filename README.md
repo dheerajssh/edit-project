@@ -45,11 +45,12 @@ The project follows a linear deployment process:
 ## Setup Instructions
 
 ## Future Enhancements
-Automated Testing: Integrate a testing framework (e.g., go test) to automate application testing.
-Multiple Environments: Expand Terraform configuration to support multiple environments (e.g., staging, production).
-Monitoring: Integrate monitoring tools (e.g., Prometheus, Grafana) to monitor the application's health and performance.
-CI/CD Enhancements: Add more advanced CI/CD practices such as Blue-Green Deployment, Canary Releases, or Rollbacks.
-Configuration Management with Chef: Incorporate Chef to manage and automate the application deployment process, enabling consistent and repeatable deployments across different environments.
+- **Automated Testing**: Integrate a testing framework (e.g., go test) to automate application testing.
+- **Multi-Cloud Environment Support**: Expand Terraform configuration to support multiple environments across various cloud providers
+- **Monitoring**: Integrate the ELK stack (Elasticsearch, Logstash, Kibana) to monitor the application's health, performance and logs.
+- **CI/CD Enhancements**: Add more advanced CI/CD practices such as Blue-Green Deployment and Rollback mechanism.
+- **Configuration Management**: Incorporate Chef to manage and automate the application deployment process, enabling consistent and repeatable deployments across different environments.
+
 ### 1. Clone the Repository
 
 ```bash
