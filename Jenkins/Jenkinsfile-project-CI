@@ -18,7 +18,6 @@ pipeline {
             steps {
                 script {
 					sshagent(credentials: [SSH_CREDENTIALS_ID]) {
-						// Use the sh step to execute the SSH command
 						sh "rsync -avz --delete -e 'ssh -o StrictHostKeyChecking=no' /path/to/your/jenkins/workspace/* root@${TARGET_IP}:${REMOTE_PATH}"
 					}	
                 }
@@ -28,7 +27,6 @@ pipeline {
         stage('build') { //Compile and build the application to generate an executable file
             steps {
                 script {
-                    // Run npm commands
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
                         sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd ${REMOTE_PATH} && sudo go mod tidy'"					
                         sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'cd ${REMOTE_PATH} && sudo go build main'"

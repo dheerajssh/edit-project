@@ -11,19 +11,17 @@ pipeline {
     }
     
     stages {
-	
-        stage ('Sync') {
+        stage ('Synchronize') { // Synchronize source files to destination folder on remote machine
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
-                        // Sync source files to destination folder on remote machine
                         sh "ssh -o StrictHostKeyChecking=no root@${TARGET_IP} 'rsync -avz --delete /path/to/executable /project/directory/on/target/machine/'"
                     }
                 }
             }
         }
 	
-        stage('Containerize Backend') {
+        stage('Containerize Backend') { //Create a Docker image for the application
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
@@ -33,7 +31,7 @@ pipeline {
             }
         }
         
-        stage('Containerize Database') {
+        stage('Containerize Database') { //Create a Docker image for MySQL database
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
@@ -43,7 +41,7 @@ pipeline {
             }
         }
         
-        stage('Deploy Database') {
+        stage('Deploy Database') { //Run database container
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
@@ -57,7 +55,7 @@ pipeline {
             }
         }
         
-        stage('Deploy Backend') {
+        stage('Deploy Backend') { //Run application container
             steps {
                 script {
                     sshagent(credentials: [SSH_CREDENTIALS_ID]) {
