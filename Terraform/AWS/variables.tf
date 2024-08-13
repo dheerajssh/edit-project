@@ -1,3 +1,6 @@
+# The default region here is Mumbai
+# The default ami_id is of a debian 12 machine in Mumbai region
+# you can change these values and set to default here
 variable "region" {
   description = "The AWS region to create resources in"
   default     = "ap-south-1"

@@ -7,11 +7,13 @@ provider "azurerm" {
   tenant_id       = var.tenant_id
 }
 
+# Define Resource group
 resource "azurerm_resource_group" "rg" {
   name     = "NewTerraformResourceGroup"
   location = "Central India"
 }
 
+# Define Virtual network
 resource "azurerm_virtual_network" "vnet" {
   name                = "myVNet"
   address_space       = ["10.0.0.0/16"]
@@ -19,6 +21,7 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = azurerm_resource_group.rg.name
 }
 
+# Define Subnet
 resource "azurerm_subnet" "subnet" {
   name                 = "mySubnet"
   resource_group_name  = azurerm_resource_group.rg.name
@@ -26,6 +29,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+# Define Network Interface
 resource "azurerm_network_interface" "nic" {
   name                = "myNIC"
   location            = azurerm_resource_group.rg.location
@@ -39,6 +43,7 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
+# Define Public IP
 resource "azurerm_public_ip" "public_ip" {
   name                = "myPublicIP"
   location            = azurerm_resource_group.rg.location
@@ -46,6 +51,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Dynamic"
 }
 
+Define Virtual machine
 resource "azurerm_linux_virtual_machine" "my_vm" {
   name                = "myVM"
   resource_group_name = azurerm_resource_group.rg.name
@@ -58,6 +64,7 @@ resource "azurerm_linux_virtual_machine" "my_vm" {
 
   admin_username = "adminuser"
 
+# Define SSH key resource, the public key is used here for ssh authorization, you can use ssh-keygen command to generate a key pair on your linux machine
   admin_ssh_key {
     username   = "adminuser"
     public_key = file("~/.ssh/id_rsa.pub")

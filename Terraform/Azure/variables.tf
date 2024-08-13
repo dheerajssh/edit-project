@@ -1,3 +1,4 @@
+# The default region can be changed from here, currently it's set to Cemtral India
 variable "subscription_id" {
   description = "Azure Subscription ID"
   type        = string
@@ -22,7 +23,6 @@ variable "tenant_id" {
 variable "resource_group_name" {
   description = "Azure Resource Group"
   type        = string
-  default     = "Terraform"
 }
 
 variable "location" {
