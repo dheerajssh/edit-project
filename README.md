@@ -55,4 +55,3 @@ The project follows a linear deployment process:
 
 ```bash
 git clone https://github.com/dheerajssh/edit-project.git
-cd edit-project

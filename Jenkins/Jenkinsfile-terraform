@@ -1,0 +1,221 @@
+pipeline {
+    agent any
+
+    environment {
+        // Provide the paths for the Terraform configurations
+        AWS_CONFIG_PATH = "path/to/aws/config"
+        AZURE_CONFIG_PATH = "path/to/azure/config"
+        DO_CONFIG_PATH = "path/to/digitalocean/config"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone your repository that contains the Terraform scripts
+                git 'https://your-repo-url.git'
+            }
+        }
+
+        stage('User Input') {
+            steps {
+                script {
+                    // Prompt the user to select the cloud provider
+                    def userChoice = input(id: 'cloudProviderInput', message: 'On which cloud provider do you want to create a machine?', parameters: [
+                        [$class: 'ChoiceParameterDefinition', choices: 'AWS\nAzure\nDigitalOcean', description: 'Select the cloud provider', name: 'CLOUD_PROVIDER']
+                    ])
+                    
+                    // Set the selected cloud provider as an environment variable
+                    env.SELECTED_CLOUD_PROVIDER = userChoice
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan') {
+            steps {
+                script {
+                    if (env.SELECTED_CLOUD_PROVIDER == 'AWS') {
+                        dir("${AWS_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="aws-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'Azure') {
+                        dir("${AZURE_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="azure-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'DigitalOcean') {
+                        dir("${DO_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="do-plan.tfplan"'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    if (env.SELECTED_CLOUD_PROVIDER == 'AWS') {
+                        dir("${AWS_CONFIG_PATH}") {
+                            sh 'terraform apply "aws-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'Azure') {
+                        dir("${AZURE_CONFIG_PATH}") {
+                            sh 'terraform apply "azure-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'DigitalOcean') {
+                        dir("${DO_CONFIG_PATH}") {
+                            sh 'terraform apply "do-plan.tfplan"'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan for AWS') {
+            steps {
+                dir("${AWS_CONFIG_PATH}") {
+                    sh 'terraform init'
+                    sh 'terraform plan -var-file="secret.tfvars" -out="aws-plan.tfplan"'
+                }
+            }
+        }
+
+        stage('Terraform Apply for AWS') {
+            steps {
+                dir("${AWS_CONFIG_PATH}") {
+                    sh 'terraform apply "aws-plan.tfplan"'
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan for Azure') {
+            steps {
+                dir("${AZURE_CONFIG_PATH}") {
+                    sh 'terraform init'
+                    sh 'terraform plan -var-file="secret.tfvars" -out="azure-plan.tfplan"'
+                }
+            }
+        }
+
+        stage('Terraform Apply for Azure') {
+            steps {
+                dir("${AZURE_CONFIG_PATH}") {
+                    sh 'terraform apply "azure-plan.tfplan"'
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan for DigitalOcean') {
+            steps {
+                dir("${DO_CONFIG_PATH}") {
+                    sh 'terraform init'
+                    sh 'terraform plan -var-file="secret.tfvars" -out="do-plan.tfplan"'
+                }
+            }
+        }
+
+        stage('Terraform Apply for DigitalOcean') {
+            steps {
+                dir("${DO_CONFIG_PATH}") {
+                    sh 'terraform apply "do-plan.tfplan"'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Always clean up the workspace to avoid conflicts in future runs
+            cleanWs()
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+pipeline {
+    agent any
+
+    environment {
+        // Provide the paths for the Terraform configurations
+        AWS_CONFIG_PATH = "path/to/aws/config"
+        AZURE_CONFIG_PATH = "path/to/azure/config"
+        DO_CONFIG_PATH = "path/to/digitalocean/config"
+    }
+
+    stages {
+        stage('User Input') {
+            steps {
+                script {
+                    // Prompt the user to select the cloud provider
+                    def userChoice = input(id: 'cloudProviderInput', message: 'On which cloud provider do you want to create a machine?', parameters: [
+                        [$class: 'ChoiceParameterDefinition', choices: 'AWS\nAzure\nDigitalOcean', description: 'Select the cloud provider', name: 'CLOUD_PROVIDER']
+                    ])
+                    
+                    // Set the selected cloud provider as an environment variable
+                    env.SELECTED_CLOUD_PROVIDER = userChoice
+                }
+            }
+        }
+
+        stage('Terraform Init and Plan') {
+            steps {
+                script {
+                    if (env.SELECTED_CLOUD_PROVIDER == 'AWS') {
+                        dir("${AWS_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="aws-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'Azure') {
+                        dir("${AZURE_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="azure-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'DigitalOcean') {
+                        dir("${DO_CONFIG_PATH}") {
+                            sh 'terraform init'
+                            sh 'terraform plan -var-file="secret.tfvars" -out="do-plan.tfplan"'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    if (env.SELECTED_CLOUD_PROVIDER == 'AWS') {
+                        dir("${AWS_CONFIG_PATH}") {
+                            sh 'terraform apply "aws-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'Azure') {
+                        dir("${AZURE_CONFIG_PATH}") {
+                            sh 'terraform apply "azure-plan.tfplan"'
+                        }
+                    } else if (env.SELECTED_CLOUD_PROVIDER == 'DigitalOcean') {
+                        dir("${DO_CONFIG_PATH}") {
+                            sh 'terraform apply "do-plan.tfplan"'
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            // Always clean up the workspace to avoid conflicts in future runs
+            cleanWs()
+        }
+    }
+}
