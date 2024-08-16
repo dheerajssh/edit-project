@@ -7,7 +7,7 @@ provider "aws" {
 # Define SSH key resource, the public key is used here for ssh authorization, you can use ssh-keygen command to generate a key pair on your linux machine
 resource "aws_key_pair" "debian_key" {
   key_name   = "terraform_key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  public_key = file("/var/lib/jenkins/.ssh/id_rsa.pub")
 }
 
 # Define security group, it will allow port 22 for ssh connections
@@ -44,7 +44,7 @@ resource "aws_instance" "debian_instance" {
   connection {
     type        = "ssh"
     user        = "admin"  # Ensure this is correct
-    private_key = file("~/.ssh/id_rsa")
+    private_key = file("/var/lib/jenkins/.ssh/id_rsa")
     host        = self.public_ip
   }
 

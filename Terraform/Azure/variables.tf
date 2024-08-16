@@ -23,6 +23,7 @@ variable "tenant_id" {
 variable "resource_group_name" {
   description = "Azure Resource Group"
   type        = string
+  default     = "NewTerraformResourceGroup"
 }
 
 variable "location" {

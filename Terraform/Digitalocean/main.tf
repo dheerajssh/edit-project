@@ -14,7 +14,7 @@ provider "digitalocean" {
 # Define SSH key resource, the public key is used here for ssh authorization, you can use ssh-keygen command to generate a key pair on your linux machine
 resource "digitalocean_ssh_key" "default" {
   name       = "my-ssh-key"
-  public_key = file("~/.ssh/id_rsa.pub")  # Path to your public key file
+  public_key = file("/var/lib/jenkins/.ssh/id_rsa.pub")  # Path to your public key file
 }
 
 # Define droplet resources
@@ -31,7 +31,7 @@ resource "digitalocean_droplet" "web" {
   connection {
     type        = "ssh"
     user        = "root"
-    private_key = file("~/.ssh/id_rsa")
+    private_key = file("/var/lib/jenkins/.ssh/id_rsa")
     host        = self.ipv4_address
   }
 

@@ -9,7 +9,7 @@ provider "azurerm" {
 
 # Define Resource group
 resource "azurerm_resource_group" "rg" {
-  name     = "NewTerraformResourceGroup"
+  name     = var.resource_group_name
   location = "Central India"
 }
 
@@ -51,7 +51,7 @@ resource "azurerm_public_ip" "public_ip" {
   allocation_method   = "Dynamic"
 }
 
-Define Virtual machine
+# Define Virtual machine
 resource "azurerm_linux_virtual_machine" "my_vm" {
   name                = "myVM"
   resource_group_name = azurerm_resource_group.rg.name
@@ -67,7 +67,7 @@ resource "azurerm_linux_virtual_machine" "my_vm" {
 # Define SSH key resource, the public key is used here for ssh authorization, you can use ssh-keygen command to generate a key pair on your linux machine
   admin_ssh_key {
     username   = "adminuser"
-    public_key = file("~/.ssh/id_rsa.pub")
+    public_key = file("/var/lib/jenkins/.ssh/id_rsa.pub")
   }
 
   os_disk {
