@@ -11,18 +11,18 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-# Define SSH key resource, the public key is used here for ssh authorization, you can use ssh-keygen command to generate a key pair on your linux machine
+# Define SSH key resource, the public key is used here for ssh authorization
 resource "digitalocean_ssh_key" "default" {
   name       = "my-ssh-key"
-  public_key = file("/var/lib/jenkins/.ssh/id_rsa.pub")  # Path to your public key file
+  public_key = file("/var/lib/jenkins/.ssh/id_rsa.pub")
 }
 
 # Define droplet resources
 resource "digitalocean_droplet" "web" {
-  image  = "debian-11-x64"
+  image  = "ubuntu-22-04-x64"
   name   = "dust"
   region = "blr1"
-  size   = "s-2vcpu-2gb"
+  size   = "s-2vcpu-4gb"
   ssh_keys = [digitalocean_ssh_key.default.id]
   ipv6 = true
 
@@ -37,7 +37,35 @@ resource "digitalocean_droplet" "web" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo Hello, World!"
+      "sudo apt-get update",
+
+      # Install Docker
+      "curl -fsSL https://get.docker.com -o get-docker.sh",
+      "sudo sh get-docker.sh",
+
+      # Install minikube
+      # Install dependencies
+      "sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl",
+
+      # Add Kubernetes apt repository
+      "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -",
+      "echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list",
+
+      # Install kubectl
+      "sudo snap install kubectl --classic",
+      "kubectl version --client",
+
+      # Install Minikube
+      "curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64",
+      "sudo install minikube-linux-amd64 /usr/local/bin/minikube",
+      "minikube version",
+
+      # Start Minikube with Docker driver
+      "minikube start --driver=docker --force",
     ]
   }
+}
+
+output "droplet_ip" {
+  value = digitalocean_droplet.web.ipv4_address
 }
