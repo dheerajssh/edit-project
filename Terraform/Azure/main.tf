@@ -141,7 +141,6 @@ resource "null_resource" "install_docker_minikube" {
       # Start Minikube with Docker driver
       "echo 'Starting Minikube...'",
       "sudo minikube start --driver=docker --force",
-#      "sudo minikube status"
     ]
 
     connection {
