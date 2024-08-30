@@ -56,6 +56,7 @@ The architecture diagram illustrates the flow from code development and CI/CD or
 
 ```bash
 git clone https://github.com/dheerajssh/edit-project.git
+```
 
 ### 2. Configure Jenkins
 - Install the necessary plugins for Git, Terraform, Docker, and Kubernetes.
