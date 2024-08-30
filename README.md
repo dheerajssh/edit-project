@@ -36,7 +36,7 @@ The project follows a structured workflow:
 
 ## Architecture Diagram
 
-path_to_your_architecture_diagram.png
+![Architecture Diagram](docs/arch.png)
 
 The architecture diagram illustrates the flow from code development and CI/CD orchestration by Jenkins, to infrastructure provisioning with Terraform, and finally, application deployment managed by Kubernetes.
 
